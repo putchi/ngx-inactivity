@@ -19,6 +19,11 @@ export class NgxInactivityDirective {
   private mousemove = new EventEmitter();
 
   /**
+   * Wheel move event emitter
+   */
+  private wheelmove = new EventEmitter();
+
+  /**
    * Mouse down event emitter
    */
   private mousedown = new EventEmitter();
@@ -56,15 +61,25 @@ export class NgxInactivityDirective {
   /**
    * Attach a mouse move listener
    */
+  @HostListener('document:wheel', ['$event'])
+  onWheelmove(event) {
+    this.wheelmove.emit(event);
+  }
+
+  /**
+   * Attach a mouse move (and touch move) listener(s)
+   */
   @HostListener('document:mousemove', ['$event'])
+  @HostListener('document:touchmove', ['$event'])
   onMousemove(event) {
     this.mousemove.emit(event);
   }
 
   /**
-   * Atach a mouse down listener
+   * Atach a mouse down (and touch end) listener(s)
    */
   @HostListener('document:mousedown', ['$event'])
+  @HostListener('document:touchend', ['$event'])
   onMousedown(event) {
     this.mousedown.emit(event);
   }
@@ -83,7 +98,7 @@ export class NgxInactivityDirective {
      * by blending their values into one Observable
      */
     this.mousemove
-      .merge(this.mousedown, this.keypress)
+      .merge(this.wheelmove, this.mousedown, this.keypress)
 
       /*
        * Debounce to emits a value from the source Observable
@@ -108,7 +123,7 @@ export class NgxInactivityDirective {
     /**
      * Inactivity callback if timeout (in minutes) is exceeded
      */
-    this.timeoutId = setTimeout(() => this.ngxInactivityCallback.emit(true), this.ngxInactivity * 60000);
+    this.timeoutId = setTimeout(() =>  this.ngxInactivityCallback.emit(true), this.ngxInactivity * 60000);
   }
 
   /**
