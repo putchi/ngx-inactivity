@@ -49,6 +49,11 @@ export class NgxInactivityDirective {
   @Output() ngxInactivityCallback = new EventEmitter();
 
   /**
+   * Inactivity reset callback after timeout
+   */
+  @Output() ngxInactivityResetCallback = new EventEmitter();
+
+  /**
    * Attach a mouse move listener
    */
   @HostListener('document:mousemove', ['$event'])
@@ -111,6 +116,7 @@ export class NgxInactivityDirective {
    */
   public reset(): void {
     clearTimeout(this.timeoutId);
+    this.ngxInactivityResetCallback.emit(true);
   }
 
 }
